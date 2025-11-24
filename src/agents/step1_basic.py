@@ -21,12 +21,18 @@ logging.basicConfig(
 
 
 async def step1_basic():
+    # * 记得将源文件恢复到有错误的状态
+    with open("./workspace/hello.js", "w", encoding="utf-8") as f:
+        f.write("""function hello() {
+  console.log("Hello");
+}""")
+
     # 没有配置“模型”相关的信息，因为运行时依赖 claude-code，也就使用了其配置的模型（例如通过环境变量配置的 GLM-4.6）
     options = ClaudeAgentOptions(
         system_prompt="你是一个惜字如金的大师，尽可能使用言简意赅的文言文回复用户。",
         cwd="./workspace",
-        # 允许使用内置的 Read&Write 工具进行文件读写
-        allowed_tools=["Read", "Write"],
+        # 允许使用内置工具进行文件读写
+        allowed_tools=["Read", "Write", "Edit"],
     )
 
     # query 代表“一次对话”，即用户发出一条消息，agent 循环进行文本生成和工具调用，直到认为任务已完成

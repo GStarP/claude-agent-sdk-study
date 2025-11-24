@@ -39,15 +39,6 @@ async def step2_mini_claude_code():
 
     # 使用 Hook 机制动态控制工具使用
     async def preprocess_tool_use(input_data, tool_use_id, context):
-        # ! Windows 使用 Bash 工具容易超时，直接禁掉
-        if input_data["tool_name"] == "Bash":
-            return {
-                "hookSpecificOutput": {
-                    "hookEventName": "PreToolUse",
-                    "permissionDecision": "deny",
-                    "permissionDecisionReason": "当前环境不支持使用 Bash 工具",
-                }
-            }
         # 已被用户允许的工具直接返回 permissionDecision=allow 允许使用
         if input_data["tool_name"] in allowed_tool_set:
             return {
@@ -98,10 +89,6 @@ async def step2_mini_claude_code():
                     and message.content[0].is_error
                 ):
                     tool_name = call_id_tool_map.get(message.content[0].tool_use_id)
-
-                    if tool_name == "Bash":
-                        # ! Windows 使用 Bash 工具容易超时，故不提示用户授权
-                        continue
 
                     if tool_name is not None:
                         tool_to_allow = tool_name
